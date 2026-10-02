@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+
+# Generated output
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+!.env.sample
+.npmrc
+.idea/
+.vscode/
+*.iml
+
+# Logs and temporary files
+*.log
+*.tgz
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.cache/
+.tmp/
+
+# OS files
+.DS_Store
+Thumbs.db

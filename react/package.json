@@ -1,0 +1,47 @@
+{
+  "name": "@tmark/react",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "React renderer for TMark documents",
+  "homepage": "https://github.com/waus/tmark-js#readme",
+  "bugs": { "url": "https://github.com/waus/tmark-js/issues" },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/waus/tmark-js.git",
+    "directory": "react"
+  },
+  "publishConfig": { "access": "public" },
+  "files": ["dist/tmark-react.js", "dist/*.d.ts", "src/tmark-react.css"],
+  "main": "./dist/tmark-react.js",
+  "module": "./dist/tmark-react.js",
+  "types": "./dist/tmark-react.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/tmark-react.d.ts",
+      "default": "./dist/tmark-react.js"
+    },
+    "./browser": "./dist/tmark-react.js",
+    "./style.css": "./src/tmark-react.css"
+  },
+  "scripts": {
+    "build": "tsc --declaration --emitDeclarationOnly --outDir dist && node scripts/build-react.mjs",
+    "build:example": "node scripts/build-example.mjs",
+    "prepack": "npm run build"
+  },
+  "dependencies": {
+    "@tmark/tmark": "^0.1.0",
+    "leaflet": "^1.9.4",
+    "mathjax-full": "^3.2.2"
+  },
+  "peerDependencies": {
+    "react": ">=18"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "esbuild": "^0.25.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "typescript": "^5.0.0"
+  }
+}

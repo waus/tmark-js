@@ -1,0 +1,43 @@
+{
+  "name": "@tmark/react-native",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "React Native renderer for TMark documents",
+  "homepage": "https://github.com/waus/tmark-js#readme",
+  "bugs": { "url": "https://github.com/waus/tmark-js/issues" },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/waus/tmark-js.git",
+    "directory": "react-native"
+  },
+  "publishConfig": { "access": "public" },
+  "files": ["dist/tmark-react-native.js", "dist/*.d.ts"],
+  "main": "./dist/tmark-react-native.js",
+  "types": "./dist/tmark-react-native.d.ts",
+  "react-native": "./dist/tmark-react-native.js",
+  "exports": {
+    ".": {
+      "types": "./dist/tmark-react-native.d.ts",
+      "react-native": "./dist/tmark-react-native.js",
+      "default": "./dist/tmark-react-native.js"
+    }
+  },
+  "dependencies": {
+    "@tmark/tmark": "^0.1.0"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-native": ">=0.76"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.0",
+    "react": "^18.0.0",
+    "react-native": "^0.76.0",
+    "typescript": "^5.0.0"
+  },
+  "scripts": {
+    "build": "tsc --declaration --outDir dist --noEmit false",
+    "typecheck": "tsc --noEmit",
+    "prepack": "npm run build"
+  }
+}

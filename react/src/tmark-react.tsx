@@ -1,12 +1,16 @@
 import React from "react";
+import { createPortal } from "react-dom";
 import type {
+  AudioNode,
   BlockNode,
   Caption,
   Cell,
+  ImageNode,
   ListItem,
   RichNode,
   SlideshowNode,
   TmarkNode,
+  VideoNode,
 } from "@tmark/tmark";
 
 type MathRenderer = {
@@ -166,9 +170,9 @@ function defaultBlockView(value: BlockNode | TmarkNode, mediaRenderer?: TmarkMed
           {value.caption && <CaptionView caption={value.caption} />}
         </figure>
       );
-    case "image": return <MediaBlock node={value} kind="image" mediaRenderer={mediaRenderer} />;
-    case "video": return <MediaBlock node={value} kind="video" mediaRenderer={mediaRenderer} />;
-    case "audio": return <MediaBlock node={value} kind="audio" mediaRenderer={mediaRenderer} />;
+    case "image":
+    case "video":
+    case "audio": return <MediaBlock node={value} mediaRenderer={mediaRenderer} />;
     case "slideshow":
       return <SlideshowView nodes={value.children} caption={value.caption} mediaRenderer={mediaRenderer} />;
     case "table":
@@ -271,12 +275,12 @@ function ListItemView({ item, ordered, index, mediaRenderer }: { item: ListItem;
   );
 }
 
-function MediaBlock({ node, kind, mediaRenderer }: { node: { src: string; caption?: Caption; hasSpoiler?: boolean }; kind: "image" | "video" | "audio"; mediaRenderer?: TmarkMediaRenderer }) {
-  const src = safeMediaUrl(node.src, kind);
+type MediaNode = ImageNode | VideoNode | AudioNode;
 
+function MediaBlock({ node, mediaRenderer }: { node: MediaNode; mediaRenderer?: TmarkMediaRenderer }) {
   return (
     <figure>
-      {src && <MediaContent src={src} kind={kind} hasSpoiler={node.hasSpoiler} mediaRenderer={mediaRenderer} />}
+      <MediaContent node={node} mediaRenderer={mediaRenderer} />
       {node.caption && <CaptionView caption={node.caption} />}
     </figure>
   );
@@ -288,7 +292,7 @@ function CollageView({ nodes, caption, mediaRenderer }: { nodes?: SlideshowNode[
       <div className="tmark-collage">
         {nodes?.map((node, index) => (
           <div className="tmark-collage-item" key={index}>
-            <GalleryNodeView node={node} mediaRenderer={mediaRenderer} />
+            <MediaContent node={node} mediaRenderer={mediaRenderer} />
           </div>
         ))}
       </div>
@@ -314,7 +318,7 @@ function SlideshowView({ nodes = [], caption, mediaRenderer }: { nodes?: Slidesh
     <figure>
       <div className="tmark-slideshow">
         <div className="tmark-slideshow-slide">
-          <GalleryNodeView node={nodes[index]} mediaRenderer={mediaRenderer} />
+          <MediaContent node={nodes[index]} mediaRenderer={mediaRenderer} />
         </div>
         {canPage && (
           <>
@@ -329,10 +333,6 @@ function SlideshowView({ nodes = [], caption, mediaRenderer }: { nodes?: Slidesh
   );
 }
 
-function GalleryNodeView({ node, mediaRenderer }: { node: SlideshowNode; mediaRenderer?: TmarkMediaRenderer }) {
-  return <MediaContent src={safeMediaUrl(node.src, node.kind)} kind={node.kind} hasSpoiler={node.hasSpoiler} mediaRenderer={mediaRenderer} />;
-}
-
 function ChevronIcon({ direction }: { direction: "prev" | "next" }) {
   return (
     <svg className="tmark-slideshow-chevron" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -341,16 +341,68 @@ function ChevronIcon({ direction }: { direction: "prev" | "next" }) {
   );
 }
 
-function MediaContent({ src, kind, hasSpoiler, mediaRenderer }: { src?: string; kind: "image" | "video" | "audio"; hasSpoiler?: boolean; mediaRenderer?: TmarkMediaRenderer }) {
+function MediaContent({ node, mediaRenderer }: { node: MediaNode; mediaRenderer?: TmarkMediaRenderer }) {
+  const { kind } = node;
+  const src = safeMediaUrl(node.src, kind);
   if (!src) return null;
-  const content = mediaRenderer?.({ src, kind }) ?? defaultMedia({ src }, kind);
-  return hasSpoiler ? <SpoilerMedia>{content}</SpoilerMedia> : content;
+  const content = mediaRenderer?.({ src, kind }) ?? (kind === "video"
+    ? <VideoContent key={JSON.stringify([src, node.preview, node.loop])} src={src} preview={safeMediaUrl(node.preview ?? "", "image")} loop={node.loop} />
+    : kind === "image" ? <img src={src} alt="" /> : <audio src={src} controls />);
+  return "hasSpoiler" in node && node.hasSpoiler ? <SpoilerMedia>{content}</SpoilerMedia> : content;
 }
 
-function defaultMedia(node: { src: string }, kind: "image" | "video" | "audio") {
-  if (kind === "image") return <img src={node.src} alt="" />;
-  if (kind === "video") return <video src={node.src} controls />;
-  return <audio src={node.src} controls />;
+function VideoContent({ src, preview, loop }: { src: string; preview?: string; loop?: boolean }) {
+  const [previewLoaded, setPreviewLoaded] = React.useState(false);
+  const [previewFailed, setPreviewFailed] = React.useState(false);
+  const [videoReady, setVideoReady] = React.useState(false);
+  const [open, setOpen] = React.useState(false);
+  const playButton = React.useRef<HTMLButtonElement>(null);
+
+  return <>
+    <span className={`tmark-video-preview${preview && !previewFailed ? "" : " tmark-video-no-preview"}`}>
+      {preview && !previewFailed && <img src={preview} alt="" onLoad={() => setPreviewLoaded(true)} onError={() => { setPreviewFailed(true); setPreviewLoaded(true); }} />}
+      {loop ? (previewLoaded || !preview) && <video
+        src={src}
+        muted
+        loop
+        playsInline
+        autoPlay
+        preload="auto"
+        className={videoReady ? "tmark-video-ready" : undefined}
+        onPlaying={() => setVideoReady(true)}
+      /> : <button
+        ref={playButton}
+        className="tmark-video-play"
+        type="button"
+        aria-label="Play video"
+        onClick={() => setOpen(true)}
+      ><span aria-hidden="true">▶</span></button>}
+    </span>
+    {open && createPortal(<VideoDialog src={src} onClose={() => {
+      setOpen(false);
+      requestAnimationFrame(() => playButton.current?.focus());
+    }} />, document.body)}
+  </>;
+}
+
+function VideoDialog({ src, onClose }: { src: string; onClose: () => void }) {
+  const closeButton = React.useRef<HTMLButtonElement>(null);
+
+  React.useEffect(() => {
+    closeButton.current?.focus();
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [onClose]);
+
+  return <div className="tmark-video-dialog" role="dialog" aria-modal="true" aria-label="Video player" onMouseDown={(event) => {
+    if (event.target === event.currentTarget) onClose();
+  }}>
+    <button ref={closeButton} className="tmark-video-close" type="button" aria-label="Close video" onClick={onClose}>×</button>
+    <video src={src} controls autoPlay playsInline />
+  </div>;
 }
 
 function SpoilerMedia({ children }: { children: React.ReactNode }) {

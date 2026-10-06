@@ -1,6 +1,6 @@
 {
   "name": "@tmark/tmark",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "type": "module",
   "description": "Parser and serializer for TMark documents",
   "homepage": "https://github.com/waus/tmark-js#readme",

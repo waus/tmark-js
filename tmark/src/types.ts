@@ -49,7 +49,7 @@ export interface ListBlock { kind: "list"; items?: ListItem[] }
 export interface ListItem { kind: "listItem"; type?: string; order?: number; checked?: boolean; children?: RichBlocks }
 export interface MapBlock { kind: "map"; lat: number; lon: number; zoom?: number; caption?: Caption }
 export interface ImageNode { kind: "image"; src: string; caption?: Caption; hasSpoiler?: boolean }
-export interface VideoNode { kind: "video"; src: string; caption?: Caption; hasSpoiler?: boolean }
+export interface VideoNode { kind: "video"; src: string; preview?: string; loop?: boolean; caption?: Caption; hasSpoiler?: boolean }
 export interface AudioNode { kind: "audio"; src: string; caption?: Caption }
 export interface Slideshow { kind: "slideshow"; caption?: Caption; children?: SlideshowNode[] }
 export type TableCellAlign = "left" | "center" | "right";

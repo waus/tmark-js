@@ -105,7 +105,7 @@ class Writer {
       case "listItem": named("type", v.type); named("order", v.order); named("checked", v.checked); unnamed(v.children); break;
       case "map": named("lat", v.lat); named("lon", v.lon); named("zoom", v.zoom); named("caption", v.caption); break;
       case "image": named("caption", v.caption); named("has_spoiler", v.hasSpoiler, true); unnamed(v.src); break;
-      case "video": named("caption", v.caption); named("has_spoiler", v.hasSpoiler, true); unnamed(v.src); break;
+      case "video": named("caption", v.caption); named("has_spoiler", v.hasSpoiler, true); named("preview", v.preview); named("loop", v.loop, true); unnamed(v.src); break;
       case "audio": named("caption", v.caption); unnamed(v.src); break;
       case "slideshow": named("caption", v.caption); unnamed(v.children); break;
       case "table": named("caption", v.caption); named("bordered", v.bordered, true); named("striped", v.striped, true); unnamed(v.rows, true); break;
@@ -402,7 +402,7 @@ class Decoder {
         case "li": value = this.listItem(b); break;
         case "map": value = { kind: "map", lat: parseNumber(partText(b.req("lat"))), lon: parseNumber(partText(b.req("lon"))), zoom: optNum(b.field("zoom"), true), caption: this.optionalCaption(b.field("caption")) }; break;
         case "img": value = { kind: "image", src: partText(b.unnamed), caption: this.optionalCaption(b.field("caption")), hasSpoiler: optBool(b.field("has_spoiler")) ?? false }; break;
-        case "video": value = { kind: "video", src: partText(b.unnamed), caption: this.optionalCaption(b.field("caption")), hasSpoiler: optBool(b.field("has_spoiler")) ?? false }; break;
+        case "video": value = { kind: "video", src: partText(b.unnamed), caption: this.optionalCaption(b.field("caption")), hasSpoiler: optBool(b.field("has_spoiler")) ?? false, preview: optText(b.field("preview")) ?? "", loop: optBool(b.field("loop")) ?? false }; break;
         case "audio": value = { kind: "audio", src: partText(b.unnamed), caption: this.optionalCaption(b.field("caption")) }; break;
         case "slideshow": value = { kind: "slideshow", caption: this.optionalCaption(b.field("caption")), children: this.slides(b.unnamed) }; break;
         case "table": value = { kind: "table", caption: this.rich(b.field("caption") ?? []), bordered: optBool(b.field("bordered")) ?? false, striped: optBool(b.field("striped")) ?? false, rows: this.rows(b.unnamed) }; break;

@@ -1,6 +1,6 @@
 {
   "name": "@tmark/react-native",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "type": "module",
   "description": "React Native renderer for TMark documents",
   "homepage": "https://github.com/waus/tmark-js#readme",
@@ -23,17 +23,17 @@
     }
   },
   "dependencies": {
-    "@tmark/tmark": "^0.1.0"
+    "@tmark/tmark": "^0.3.0"
   },
   "peerDependencies": {
     "react": ">=18",
     "react-native": ">=0.76"
   },
   "devDependencies": {
-    "@types/react": "^18.0.0",
-    "react": "^18.0.0",
-    "react-native": "^0.76.0",
-    "typescript": "^5.0.0"
+    "@types/react": "^19.2.0",
+    "react": "19.2.3",
+    "react-native": "0.87.1",
+    "typescript": "^6.0.3"
   },
   "scripts": {
     "build": "tsc --declaration --outDir dist --noEmit false",

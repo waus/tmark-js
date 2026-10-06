@@ -1,6 +1,6 @@
 {
   "name": "@tmark/react",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "type": "module",
   "description": "React renderer for TMark documents",
   "homepage": "https://github.com/waus/tmark-js#readme",
@@ -29,12 +29,13 @@
     "prepack": "npm run build"
   },
   "dependencies": {
-    "@tmark/tmark": "^0.1.0",
+    "@tmark/tmark": "^0.3.0",
     "leaflet": "^1.9.4",
     "mathjax-full": "^3.2.2"
   },
   "peerDependencies": {
-    "react": ">=18"
+    "react": ">=18",
+    "react-dom": ">=18"
   },
   "devDependencies": {
     "@types/react": "^18.0.0",

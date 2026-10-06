@@ -44,6 +44,7 @@ async function loadExample(file: string): Promise<Example> {
 function ExampleScreen() {
   const insets = useSafeAreaInsets();
   const [selected, setSelected] = React.useState(0);
+  const [menuOpen, setMenuOpen] = React.useState(false);
   const [showSource, setShowSource] = React.useState(false);
   const [examples, setExamples] = React.useState<Example[]>([]);
   const [error, setError] = React.useState<string | null>(null);
@@ -66,7 +67,15 @@ function ExampleScreen() {
     <View style={[styles.screen, {paddingTop: insets.top, paddingBottom: insets.bottom}]}>
       <StatusBar barStyle="dark-content" />
       <View style={styles.header}>
-        <Text style={styles.appTitle}>tmark examples</Text>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Choose document"
+          accessibilityState={{expanded: menuOpen}}
+          onPress={() => setMenuOpen(value => !value)}
+          style={styles.documentPicker}>
+          <Text numberOfLines={1} style={styles.documentTitle}>{example.document.title}</Text>
+          <View style={styles.chevron} />
+        </Pressable>
         <Pressable
           accessibilityRole="button"
           onPress={() => setShowSource(value => !value)}
@@ -77,25 +86,6 @@ function ExampleScreen() {
         </Pressable>
       </View>
 
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.tabs}
-        contentContainerStyle={styles.tabsContent}>
-        {examples.map(({file, document}, index) => (
-          <Pressable
-            key={file}
-            accessibilityRole="button"
-            accessibilityState={{selected: index === selected}}
-            onPress={() => setSelected(index)}
-            style={[styles.tab, index === selected && styles.selectedTab]}>
-            <Text style={[styles.tabText, index === selected && styles.selectedTabText]}>
-              {document.title}
-            </Text>
-          </Pressable>
-        ))}
-      </ScrollView>
-
       <ScrollView key={`${example.file}-${showSource}`} contentContainerStyle={styles.document}>
         {showSource ? (
           <Text selectable style={styles.source}>{example.source}</Text>
@@ -103,6 +93,23 @@ function ExampleScreen() {
           <TmarkView value={example.document} />
         )}
       </ScrollView>
+      {menuOpen && (
+        <View style={styles.menuOverlay}>
+          <Pressable accessibilityLabel="Close document list" onPress={() => setMenuOpen(false)} style={StyleSheet.absoluteFill} />
+          <ScrollView style={[styles.menu, {marginTop: insets.top + 56}]}>
+            {examples.map(({file, document}, index) => (
+              <Pressable
+                key={file}
+                accessibilityRole="button"
+                accessibilityState={{selected: index === selected}}
+                onPress={() => { setSelected(index); setMenuOpen(false); }}
+                style={[styles.menuItem, index === selected && styles.selectedMenuItem]}>
+                <Text style={styles.menuItemText}>{document.title}</Text>
+              </Pressable>
+            ))}
+          </ScrollView>
+        </View>
+      )}
     </View>
   );
 }
@@ -126,15 +133,16 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: '#d5dce5',
   },
-  appTitle: {fontSize: 19, fontWeight: '700', color: '#1b2838'},
+  documentPicker: {flex: 1, flexDirection: 'row', alignItems: 'center', marginRight: 12},
+  documentTitle: {flexShrink: 1, fontSize: 19, fontWeight: '700', color: '#1b2838'},
+  chevron: {width: 9, height: 9, borderRightWidth: 2, borderBottomWidth: 2, borderColor: '#1b2838', transform: [{rotate: '45deg'}], marginLeft: 12, marginTop: -4},
   modeButton: {paddingVertical: 8, paddingHorizontal: 12},
   modeButtonText: {fontSize: 15, fontWeight: '600', color: '#1769aa'},
-  tabs: {flexGrow: 0, maxHeight: 60},
-  tabsContent: {alignItems: 'center', paddingHorizontal: 12, gap: 8},
-  tab: {paddingVertical: 8, paddingHorizontal: 12, borderRadius: 8, backgroundColor: '#f0f2f5'},
-  selectedTab: {backgroundColor: '#dceaff'},
-  tabText: {fontSize: 14, color: '#39475a'},
-  selectedTabText: {fontWeight: '700', color: '#114f83'},
+  menuOverlay: {position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, zIndex: 1},
+  menu: {maxHeight: 360, marginHorizontal: 16, backgroundColor: '#ffffff', borderRadius: 8, elevation: 4, shadowColor: '#000000', shadowOpacity: 0.16, shadowRadius: 8, shadowOffset: {width: 0, height: 3}},
+  menuItem: {paddingVertical: 12, paddingHorizontal: 16},
+  selectedMenuItem: {backgroundColor: '#dceaff'},
+  menuItemText: {fontSize: 15, color: '#1b2838'},
   document: {padding: 20, paddingBottom: 40},
   source: {fontFamily: 'monospace', fontSize: 13, lineHeight: 20, color: '#263445'},
   message: {padding: 20, color: '#263445'},

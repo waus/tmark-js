@@ -1,8 +1,13 @@
 pluginManagement { includeBuild("../../node_modules/@react-native/gradle-plugin") }
 plugins { id("com.facebook.react.settings") }
+def localProperties = new Properties()
+def localPropertiesFile = file("local.properties")
+if (localPropertiesFile.isFile()) localPropertiesFile.withInputStream { localProperties.load(it) }
+def nodeBinary = System.getenv("NODE_BINARY") ?: localProperties.getProperty("node.binary") ?: "node"
+gradle.ext.nodeBinary = nodeBinary
 extensions.configure(com.facebook.react.ReactSettingsExtension) { ex ->
     ex.autolinkLibrariesFromCommand(
-        ["npx", "@react-native-community/cli", "config"],
+        [nodeBinary, file("../../../node_modules/@react-native-community/cli/build/bin.js").absolutePath, "config"],
         file(".."),
         files("../package.json", "../../../package-lock.json")
     )

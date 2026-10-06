@@ -3,7 +3,7 @@
   "private": true,
   "workspaces": ["tmark", "react", "react-native", "react-native/example"],
   "scripts": {
-    "build": "npm run build -w @tmark/tmark && npm run build -w @tmark/react && npm run build -w @tmark/react-native",
+    "build": "npm run build -w @tmark/react-native && npm run build -w @tmark/react",
     "test": "npm test -w @tmark/tmark",
     "pack:check": "npm run build && npm pack -w @tmark/tmark --dry-run && npm pack -w @tmark/react --dry-run && npm pack -w @tmark/react-native --dry-run"
   }

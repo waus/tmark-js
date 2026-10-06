@@ -11,8 +11,8 @@
     "test": "jest"
   },
   "dependencies": {
-    "@tmark/tmark": "^0.1.0",
-    "@tmark/react-native": "^0.1.0",
+    "@tmark/tmark": "^0.3.0",
+    "@tmark/react-native": "^0.3.0",
     "react": "19.2.3",
     "react-native": "0.87.1",
     "react-native-safe-area-context": "^5.5.2"

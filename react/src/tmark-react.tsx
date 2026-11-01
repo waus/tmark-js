@@ -1,5 +1,6 @@
 import React from "react";
 import { createPortal } from "react-dom";
+import { formatDateTime } from "@tmark/tmark";
 import type {
   AudioNode,
   BlockNode,
@@ -527,15 +528,16 @@ function LeafletMapView({ lat, lon, zoom }: { lat: number; lon: number; zoom: nu
 }
 
 function DateTimeView({ unix, timezone }: { unix: number; timezone: string }) {
+  timezone ||= "UTC";
   const date = new Date(unix * 1000);
   const local = Number.isFinite(date.getTime()) ? date.toLocaleString() : String(unix);
   let source = "";
   try {
     source = Number.isFinite(date.getTime())
-      ? date.toLocaleString(undefined, { timeZone: timezone })
-      : "";
+      ? formatDateTime(date, timezone)
+      : String(unix);
   } catch {
-    source = "";
+    source = String(unix);
   }
 
   return <time dateTime={Number.isFinite(date.getTime()) ? date.toISOString() : String(unix)} title={[source, timezone].filter(Boolean).join(" ")}>{local}</time>;

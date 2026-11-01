@@ -1,4 +1,5 @@
 import React from "react";
+import { formatDateTime } from "@tmark/tmark";
 import {
   Clipboard, Image, Linking, Pressable, ScrollView, StyleSheet, Text, View,
   type ScrollViewInstance, type StyleProp, type TextStyle, type ViewStyle,
@@ -385,10 +386,12 @@ function headingStyle(size: number): TextStyle {
 }
 
 function formatDate(unix: number, timezone: string): string {
+  timezone ||= "UTC";
   const date = new Date(unix * 1000);
-  if (!Number.isFinite(date.getTime())) return String(unix);
-  try { return date.toLocaleString(undefined, { timeZone: timezone }); }
-  catch { return date.toLocaleString(); }
+  if (!Number.isFinite(date.getTime())) return `${unix} ${timezone}`;
+  try {
+    return formatDateTime(date, timezone);
+  } catch { return `${unix} ${timezone}`; }
 }
 
 function listItemMarker(item: ListItem, ordered: boolean, index: number): string {

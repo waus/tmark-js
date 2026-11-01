@@ -385,7 +385,7 @@ class Decoder {
         case "spoiler": value = { kind: "spoiler", children: this.rich(b.unnamed) }; break;
         case "sub": value = { kind: "subscript", children: this.rich(b.unnamed) }; break;
         case "sup": value = { kind: "superscript", children: this.rich(b.unnamed) }; break;
-        case "datetime": value = { kind: "datetime", unix: parseNumber(partText(b.unnamed), true), timezone: partText(b.req("timezone")) }; break;
+        case "datetime": value = { kind: "datetime", unix: parseNumber(partText(b.unnamed), true), timezone: optText(b.field("timezone")) ?? "" }; break;
         case "code": value = { kind: "code", text: partText(b.unnamed, b.expanded) }; break;
         case "math": value = { kind: "math", expression: partText(b.unnamed, b.expanded) }; break;
         case "icon": value = { kind: "icon", src: partText(b.unnamed), alternativeText: optText(b.field("alt")) }; break;

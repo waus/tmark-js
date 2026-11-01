@@ -32,6 +32,7 @@ export interface Strikethrough { kind: "strikethrough"; children?: RichText }
 export interface Spoiler { kind: "spoiler"; children?: RichText }
 export interface Subscript { kind: "subscript"; children?: RichText }
 export interface Superscript { kind: "superscript"; children?: RichText }
+/** The source timezone is an IANA name or fixed UTC offset; an empty name means UTC. */
 export interface DateTimeNode { kind: "datetime"; unix: number; timezone: string }
 export interface Code { kind: "code"; text: string }
 export interface MathInline { kind: "math"; expression: string }
